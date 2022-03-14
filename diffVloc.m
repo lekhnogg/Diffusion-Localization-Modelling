@@ -1,44 +1,61 @@
 function diffVloc(dim)
 
-% Establish random standard deviations
+% Diffusive Model (Follows a 3D Gaussian)
+
+% Establish sigma value
 sig = 140;
 % Establish x-y plane
 xs = -dim:dim; %dim+1 values
 ys = xs;
-
 % Turn into meshgrid
 [X,Y] = meshgrid(xs,ys);
 % Adjustable normalization
 norm =20/(sqrt(2*pi));
-
-% Get z values
+% Get diffusive z values
 zvals=norm*exp(-((X.^2)/2+(Y.^2)/2)/(2*sig.^2));
 
-% 
+% Actual quasi-Gabriel's Horn/upsidedown tear drop/3d Sharp-peak gaussian shape
+
+% Standard deviation
 std = 1;
-scale = 4;
-scl = 3;
-r = linspace(0,scl*2*pi,dim) ;
+% Z value scale (how high the peak will be)
+zscale = 4;
+% Base of figure scale (how wide the base will be)
+bscale = 3;
+% Get radius values
+r = linspace(0,bscale*2*pi,dim) ;
+% Get theta values
 th = linspace(0,2*pi,dim) ;
+% Establish meshgrid in terms of radius and angle theta
 [R,T] = meshgrid(r,th) ;
+% Get x,y values in polar coordinates
 XX = R.*sin(T) ;
 YY = R.*cos(T) ;
-eps = 1e-1;
+% Establish a cut off value
+eps = 1e-2;
+% Adjust R values 
 R(R>1/eps) = eps;
 Z =(-R+2*pi);
-Z = scale*(Z +1);
+% Modulate the z values to achieve desired height
+Z = zscale*(Z +1);
+% Acquire localized z values
 Z = exp((Z.*0.1)./std);
 Z(Z<0)=0;
-minz  = min(min(Z));
+
+% Eliminate vertical offset
+minz = min(min(Z));
 Z = Z-abs(minz);
+
+% Base 2D platform (if desired)
 pX = linspace(-2*pi,2*pi,dim);
 pY = pX;
 [pXX,pYY] = meshgrid(pX,pY);
 min(min(Z))
 surf(pXX,pYY,eps*(ones(size(XX,1),size(XX,2))),'EdgeColor','none','FaceLighting','phong','FaceColor','interp','AmbientStrength',0.5);
 hold on
+
+% Localized Plot
 surf(XX,YY,Z,'EdgeColor','none','FaceLighting','phong','FaceColor','interp','AmbientStrength',0.5)
-%surf(pXX,pYY,(zeros(size(XX,1),size(XX,2))),'EdgeColor','none','FaceLighting','phong','FaceColor','interp','AmbientStrength',0.5);
 dr = 2*pi;
 axis([-dr dr -dr dr 0 50])
 %axis([-1.5*pi 1.5*pi -1.5*pi 1.5*pi 0 50])
@@ -56,6 +73,8 @@ colormap 'cool'
 light('Position',[0 1 0],'Style','infinite');
 %camlight('left');
 
+
+% Diffusive
 figure,surf(X,Y,zvals,'EdgeColor','none','FaceLighting','phong','FaceColor','interp','AmbientStrength',0.5);
 %axis([-dr dr -dr dr 0 5000])
 axis([-dim dim -dim dim 0 50])
@@ -74,17 +93,5 @@ light('Position',[0 1 0],'Style','infinite');
 %camlight('left');
 hold on
 
-% % Plotting sequence
-% std = 1;
-% scale = 4;
-% scl = 2
-% r = linspace(0,scl*2*pi,dim) ;
-% th = linspace(0,scl*2*pi,dim) ;
-% [R,T] = meshgrid(r,th);
-% XX = [R(1:dim/scl,1:dim/scl).*sin(T(1:dim/scl,1:dim/scl)) R(dim/scl+1:end,dim/scl+1:end)];
-% XX =[XX;XX]
-% YY = [R(1:dim/scl,1:dim/scl).*cos(T(1:dim/scl,1:dim/scl)) R(dim/scl+1:end,dim/scl+1:end)];
-% YY =[YY;YY]
-% eps = 1e-4;
-% R(R>1/eps) = eps;
+
 
